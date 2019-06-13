@@ -1,11 +1,12 @@
 {
-  "name": "forthis-api",
+  "name": "forkthis-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "mocha --require test/setup.js",
     "dev": "nodemon src/server.js",
+    "migrate": "postgrator --config postgrator-config.js",
     "start": "node src/server.js",
     "predeploy": "npm audit",
     "deploy": "git push heroku master"
@@ -17,13 +18,20 @@
     "chai": "^4.2.0",
     "mocha": "^6.1.4",
     "nodemon": "^1.18.11",
+    "postgrator-cli": "^3.1.0",
     "supertest": "^4.0.2"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^7.0.0",
     "express": "^4.16.4",
     "helmet": "^3.16.0",
-    "morgan": "^1.9.1"
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.17.5",
+    "morgan": "^1.9.1",
+    "pg": "^7.11.0",
+    "postgrator": "^3.10.2",
+    "xss": "^1.0.6"
   }
 }
