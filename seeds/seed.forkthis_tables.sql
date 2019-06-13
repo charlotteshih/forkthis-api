@@ -40,9 +40,9 @@ VALUES
 
 INSERT INTO recipe_items (recipe_id, item_id, quantity, unit)
 VALUES
-    (1, 1, 2, NULL),
-    (1, 2, 3, 'Tbsp.'),
-    (1, 3, 0.25, 'cups'),
+    (1, 1, '2', NULL),
+    (1, 2, '3', 'Tbsp.'),
+    (1, 3, '1/4', 'cups'),
     (1, 4, NULL, NULL);
 
 INSERT INTO recipe_steps (recipe_id, step_id)
