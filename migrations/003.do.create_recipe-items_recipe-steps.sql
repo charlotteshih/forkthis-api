@@ -1,9 +1,7 @@
 CREATE TABLE recipe_items (
     recipe_id INTEGER REFERENCES recipes(id) ON DELETE CASCADE NOT NULL,
     item_id INTEGER REFERENCES ingredients(id) ON DELETE CASCADE NOT NULL,
-    PRIMARY KEY (recipe_id, item_id),
-    quantity TEXT,
-    unit TEXT
+    PRIMARY KEY (recipe_id, item_id)
 );
 
 CREATE TABLE recipe_steps (

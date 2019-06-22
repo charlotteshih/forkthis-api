@@ -10,6 +10,5 @@ CREATE TABLE recipes (
     title TEXT NOT NULL,
     author_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
     folder_id INTEGER REFERENCES folders(id) NOT NULL,
-    serving_size INTEGER NOT NULL,
     date_created TIMESTAMP DEFAULT now() NOT NULL
 );

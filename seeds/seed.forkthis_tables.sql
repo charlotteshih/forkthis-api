@@ -12,16 +12,16 @@ TRUNCATE
 
 INSERT INTO folders (folder_name)
 VALUES
-    ('Quick and easy'),
-    ('A little more effort'),
-    ('Special Occasion'),
-    ('Baking');
+    ('Breakfast'),
+    ('Lunch'),
+    ('Dinner'),
+    ('Dessert');
 
 INSERT INTO ingredients (item)
 VALUES
-    ('Eggs'),
-    ('Olive oil'),
-    ('Milk'),
+    ('2 eggs'),
+    ('3 Tbsp. olive oil'),
+    ('1/4 cup milk'),
     ('Salt and pepper (to taste)');
 
 INSERT INTO instructions (step)
@@ -34,16 +34,16 @@ INSERT INTO users (username, password, nickname)
 VALUES
     ('cyshih', 'Password123!', 'Charlotte');
 
-INSERT INTO recipes (title, author_id, folder_id, serving_size)
+INSERT INTO recipes (title, author_id, folder_id)
 VALUES
-    ('Scrambled Eggs', 1, 1, 1);
+    ('Scrambled Eggs', 1, 1);
 
-INSERT INTO recipe_items (recipe_id, item_id, quantity, unit)
+INSERT INTO recipe_items (recipe_id, item_id)
 VALUES
-    (1, 1, '2', NULL),
-    (1, 2, '3', 'Tbsp.'),
-    (1, 3, '1/4', 'cups'),
-    (1, 4, NULL, NULL);
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (1, 4);
 
 INSERT INTO recipe_steps (recipe_id, step_id)
 VALUES
