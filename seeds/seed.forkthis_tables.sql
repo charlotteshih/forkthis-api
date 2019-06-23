@@ -1,27 +1,24 @@
 BEGIN;
 
 TRUNCATE
-    folders,
+    users,
     ingredients,
     instructions,
+    folders,
     recipes,
-    users,
     recipe_items,
     recipe_steps
     RESTART IDENTITY CASCADE;
 
-INSERT INTO folders (folder_name)
+INSERT INTO users (username, password, nickname)
 VALUES
-    ('Breakfast'),
-    ('Lunch'),
-    ('Dinner'),
-    ('Dessert');
+    ('cyshih', 'Password123!', 'Charlotte');
 
 INSERT INTO ingredients (item)
 VALUES
-    ('2 eggs'),
-    ('3 Tbsp. olive oil'),
-    ('1/4 cup milk'),
+    ('Eggs'),
+    ('Olive oil'),
+    ('Milk'),
     ('Salt and pepper (to taste)');
 
 INSERT INTO instructions (step)
@@ -30,25 +27,28 @@ VALUES
     ('Add egg-and-milk batter to pan. Stir constantly, taking care not to let eggs burn.'),
     ('When eggs are cooked through but not rubbery, remove from heat and salt and pepper to taste.');
 
-INSERT INTO users (username, password, nickname)
+INSERT INTO folders (folder_name)
 VALUES
-    ('cyshih', 'Password123!', 'Charlotte');
+    ('Breakfast'),
+    ('Lunch'),
+    ('Dinner'),
+    ('Dessert');
 
 INSERT INTO recipes (title, author_id, folder_id)
 VALUES
     ('Scrambled Eggs', 1, 1);
 
-INSERT INTO recipe_items (recipe_id, item_id)
+INSERT INTO recipe_items (recipe_id, item_id, quantity, unit)
 VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3),
-    (1, 4);
+    (1, 1, '3', ''),
+    (1, 2, '3', 'Tbsp.'),
+    (1, 3, '1/4', 'Cups'),
+    (1, 4, '', '');
 
-INSERT INTO recipe_steps (recipe_id, step_id)
+INSERT INTO recipe_steps (recipe_id, step_id, sort_order)
 VALUES
-    (1, 1),
-    (1, 2),
-    (1, 3);
+    (1, 1, 1),
+    (1, 2, 2),
+    (1, 3, 3);
 
 COMMIT;

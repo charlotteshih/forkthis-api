@@ -1,3 +1,0 @@
-DROP TABLE IF EXISTS folders;
-DROP TABLE IF EXISTS ingredients;
-DROP TABLE IF EXISTS instructions;
