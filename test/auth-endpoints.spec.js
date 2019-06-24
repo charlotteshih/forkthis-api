@@ -17,8 +17,8 @@ describe('Auth Endpoints', function() {
     app.set('db', db)
   })
 
-  before('Cleanup', () => helpers.cleanTables(db))
-  afterEach('Cleanup', () => helpers.cleanTables(db))
+  // before('Cleanup', () => helpers.cleanTables(db))
+  // afterEach('Cleanup', () => helpers.cleanTables(db))
   after('Disconnect from db', () => db.destroy())
 
   describe(`POST /api/authorization/login`, () => {

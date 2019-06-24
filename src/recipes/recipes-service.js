@@ -8,8 +8,9 @@ const RecipesService = {
       .select(
         'rcp.id',
         'rcp.title',
-        'fld.folder_name',
-        ...userInfo
+        // 'fld.folder_name',
+        ...userInfo,
+        ...folderInfo
       )
       .join(
         'users AS usr',
@@ -76,7 +77,8 @@ const RecipesService = {
       id: rcpTree.id,
       title: xss(rcpTree.title),
       folder: rcpTree.folder_name,
-      author: rcpTree.author || {}
+      author: rcpTree.author || {},
+      folder: rcpTree.folder || {}
     }
   },
 
@@ -110,15 +112,9 @@ const userInfo = [
   'usr.nickname AS author:nickname'
 ]
 
-const ingList = [
-  'ri.quantity AS ingredients:quantity',
-  'ri.unit AS ingredients:unit',
-  'ing.item AS ingredients:item',
-]
-
-const stepList = [
-  'rs.sort_order AS steps:sort_order',
-  'ins.step AS steps:step'
+const folderInfo = [
+  'fld.id AS folder:id',
+  'fld.folder_name AS folder:name'
 ]
 
 module.exports = RecipesService

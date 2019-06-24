@@ -36,7 +36,6 @@ function makeFixtures() {
   return { testUsers }
 }
 
-// TRUNCATE MORE TABLES AS I ADD MORE ENDPOINTS
 function cleanTables(db) {
   return db.transaction(trx => {
     trx.raw(
@@ -58,7 +57,7 @@ function seedUsers(db, users) {
   }))
 
   return db
-    .insert(preppsedUsers)
+    .insert(preppedUsers)
     .into('users')
     .then(() => {
       db.raw(`SELECT setval('users', ?)`, [users[users.length - 1].id])

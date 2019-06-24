@@ -1,6 +1,6 @@
 const express = require('express')
 const RecipesService = require('./recipes-service')
-const Treeize = require('treeize')
+// const { requireAuth } = require('../middleware/jwt-auth')
 
 const recipesRouter = express.Router()
 
@@ -12,6 +12,7 @@ recipesRouter.route('/')
       })
       .catch(next)
   })
+  // .post()
 
 recipesRouter.route('/:rcp_id')
   // .all(requireAuth)
@@ -19,6 +20,8 @@ recipesRouter.route('/:rcp_id')
   .get((req, res) => {
     return res.json(RecipesService.treeizeRecipe(res.recipe))
   })
+  // .patch()
+  // .delete()
 
 recipesRouter.route('/:rcp_id/ingredients')
   .all(checkRcpExists)
@@ -32,6 +35,7 @@ recipesRouter.route('/:rcp_id/ingredients')
       })
       .catch(next)
   })
+  // .post()
 
 recipesRouter.route('/:rcp_id/steps')
   .all(checkRcpExists)
@@ -45,6 +49,7 @@ recipesRouter.route('/:rcp_id/steps')
       })
       .catch(next)
   })
+  // .post()
 
 async function checkRcpExists(req, res, next) {
   try {
