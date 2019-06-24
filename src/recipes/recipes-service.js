@@ -6,98 +6,119 @@ const RecipesService = {
     return db
       .from('recipes AS rcp')
       .select(
-        // '*',
         'rcp.id',
         'rcp.title',
-        'folders.folder_name',
-        ...userInfo,
-        ...ingList,
-        ...stepList
-        // 'items.quantity',
-        // 'items.unit',
-        // 'ing.item',
-        // 'steps.sort_order',
-        // 'inst.step'
+        'fld.folder_name',
+        ...userInfo
       )
-      .innerJoin(
-        'users',
-        'rcp.author_id',
-        'users.id'
+      .join(
+        'users AS usr',
+        'usr.id',
+        'rcp.author_id'
       )
-      .innerJoin(
-        'folders',
-        'rcp.folder_id',
-        'folders.id'
+      .join(
+        'folders as fld',
+        'fld.id',
+        'rcp.folder_id'
       )
-      .innerJoin(
-        'recipe_items AS items',
-        'rcp.id',
-        'items.recipe_id'
-      )
-      .innerJoin(
-        'ingredients as ing',
-        'items.item_id',
-        'ing.id'
-      )
-      .innerJoin(
-        'recipe_steps AS steps',
-        'rcp.id',
-        'steps.recipe_id'
-      )
-      .innerJoin(
-        'instructions AS inst',
-        'steps.step_id',
-        'inst.id'
-      )
-      // .groupBy(
-      //   'rcp.id',
-      //   'users.id',
-      //   'folders.id',
-      //   'ing.id',
-      //   'items.quantity',
-      //   'items.unit',
-      //   'items.recipe_id',
-      //   'steps.recipe_id',
-      //   'steps.sort_order',
-      //   'inst.id'
-      // )
-      .orderBy('steps.sort_order')
+      .orderBy('rcp.id')
   },
 
-  serializeRecipes(recipes) {
-    return recipes.map(this.serializeRecipe)
+  getRecipeById(db, id) {
+    return RecipesService.getAllRecipes(db)
+      .where('rcp.id', id)
+      .first()
   },
 
-  serializeRecipe(recipe) {
-    const rcpTree = new Treeize()
-    const rcpData = rcpTree.grow([ recipe ]).getData()[0]
+  getRcpIngredients(db, rcp_id) {
+    return db
+      .from('recipe_items as ri')
+      .where('ri.recipe_id', rcp_id)
+      .select(
+        'ri.quantity',
+        'ri.unit',
+        'ing.item'
+      )
+      .join(
+        'ingredients AS ing',
+        'ing.id',
+        'ri.item_id'
+      )
+      .orderBy('ri.item_id')
+  },
+
+  getRcpSteps(db, rcp_id) {
+    return db
+      .from('recipe_steps as rs')
+      .where('rs.recipe_id', rcp_id)
+      .select(
+        'rs.sort_order',
+        'ins.step'
+      )
+      .join(
+        'instructions AS ins',
+        'ins.id',
+        'rs.step_id'
+      )
+  },
+
+  treeizeRecipes(recipes) {
+    return recipes.map(this.treeizeRecipe)
+  },
+
+  treeizeRecipe(recipe) {
+    const tree = new Treeize()
+    const rcpTree = tree
+      .grow([ recipe ])
+      .getData()[0]
 
     return {
-      id: rcpData.id,
-      title: xss(rcpData.title),
-      folder: rcpData.folder_name,
-      author: rcpData.author || {},
-      ingredients: rcpData.ingredients || [],
-      steps: rcpData.steps || []
+      id: rcpTree.id,
+      title: xss(rcpTree.title),
+      folder: rcpTree.folder_name,
+      author: rcpTree.author || {}
+    }
+  },
+
+  serializeIngredients(ingredients) {
+    return ingredients.map(this.serializeIngredient)
+  },
+
+  serializeIngredient(ingredient) {
+    return {
+      quantity: xss(ingredient.quantity),
+      unit: xss(ingredient.unit),
+      item: xss(ingredient.item)
+    }
+  },
+
+  serializeSteps(steps) {
+    return steps.map(this.serializeStep)
+  },
+
+  serializeStep(step) {
+    return {
+      order: step.sort_order,
+      step: xss(step.step)
     }
   }
 }
 
 const userInfo = [
-  'users.id AS author:id',
-  'users.username AS author:username',
-  'users.nickname AS author:nickname'
+  'usr.id AS author:id',
+  'usr.username AS author:username',
+  'usr.nickname AS author:nickname'
 ]
 
 const ingList = [
-  'items.quantity AS ingredients:quantity',
-  'items.unit AS ingredients:unit',
+  'ri.quantity AS ingredients:quantity',
+  'ri.unit AS ingredients:unit',
   'ing.item AS ingredients:item',
 ]
 
 const stepList = [
-  'steps.sort_order AS steps:sort_order',
-  'inst.step AS steps:step'
+  'rs.sort_order AS steps:sort_order',
+  'ins.step AS steps:step'
 ]
 
 module.exports = RecipesService
