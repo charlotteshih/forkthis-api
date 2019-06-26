@@ -8,7 +8,6 @@ const RecipesService = {
       .select(
         'rcp.id',
         'rcp.title',
-        // 'fld.folder_name',
         ...userInfo,
         ...folderInfo
       )
@@ -69,9 +68,7 @@ const RecipesService = {
 
   treeizeRecipe(recipe) {
     const tree = new Treeize()
-    const rcpTree = tree
-      .grow([ recipe ])
-      .getData()[0]
+    const rcpTree = tree.grow([ recipe ]).getData()[0]
 
     return {
       id: rcpTree.id,

@@ -2,9 +2,9 @@ BEGIN;
 
 TRUNCATE
     users,
+    folders,
     ingredients,
     instructions,
-    folders,
     recipes,
     recipe_items,
     recipe_steps

@@ -1,20 +1,38 @@
 const xss = require('xss')
 
-const FoldersService = {
+const FoldersServices = {
   getAllFolders(db) {
     return db
-      .from('folders')
+      .from('folders AS fld')
       .select(
-        'folders.id',
-        'folders.folder_name'
+        'fld.id',
+        'fld.folder_name'
       )
-      .orderBy('folders.id')
+      .orderBy('fld.id')
   },
 
   getFolderById(db, id) {
-    return FoldersService.getAllFolders(db)
-      .where('folders.id', id)
+    return FoldersServices.getAllFolders(db)
+      .where('fld.id', id)
       .first()
+  },
+
+  insertFolder(db, newFolder) {
+    return db
+      .insert(newFolder)
+      .into('folders')
+      .returning('*')
+      .then(rows => {
+        return rows[0]
+      })
+  },
+
+  updateFolder(db, id, newFolderFields) {
+    return db('folders').where({ id }).update(newFolderFields)
+  },
+
+  deleteFolder(db, id) {
+    return db('folders').where({ id }).delete()
   },
 
   serializeFolders(folders) {
@@ -26,7 +44,7 @@ const FoldersService = {
       id: folder.id,
       folder_name: xss(folder.folder_name)
     }
-  }
+  },
 }
 
-module.exports = FoldersService
+module.exports = FoldersServices
