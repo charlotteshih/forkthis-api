@@ -1,10 +1,3 @@
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username TEXT NOT NULL,
-    password TEXT NOT NULL,
-    nickname TEXT NOT NULL
-);
-
 CREATE TABLE ingredients (
     id SERIAL PRIMARY KEY,
     item TEXT NOT NULL

@@ -8,17 +8,6 @@ const RecipesService = {
       .select(
         'rcp.id',
         'rcp.title',
-        ...userInfo,
-        ...folderInfo
-      )
-      .join(
-        'users AS usr',
-        'usr.id',
-        'rcp.author_id'
-      )
-      .join(
-        'folders as fld',
-        'fld.id',
         'rcp.folder_id'
       )
       .orderBy('rcp.id')
@@ -60,22 +49,50 @@ const RecipesService = {
         'ins.id',
         'rs.step_id'
       )
+      .orderBy('rs.sort_order')
   },
 
-  treeizeRecipes(recipes) {
-    return recipes.map(this.treeizeRecipe)
+  insertRecipe(db, newRecipe) {
+    return db
+      .insert(newRecipe)
+      .into('recipes')
+      .returning('*')
+      .then(rows => rows[0])
   },
 
-  treeizeRecipe(recipe) {
-    const tree = new Treeize()
-    const rcpTree = tree.grow([ recipe ]).getData()[0]
+  insertIngredients(db, id, newIngredients) {
+    return db('recipe_items').where({ id }).update(newIngredients)
+  },
 
+  insertSteps(db, id, newSteps) {
+    return db('recipe_steps').where({ id }).update(newSteps)
+  },
+
+  updateRecipe(db, id, newRecipeFields) {
+    return db('recipes').where({ id }).update(newRecipeFields)
+  },
+
+  updateIngredients() {},
+
+  updateSteps() {},
+
+  deleteRecipe(db, id) {
+    return db('recipes').where({ id }).delete()
+  },
+
+  deleteIngredients() {},
+
+  deleteSteps() {},
+
+  serializeRecipes(recipes) {
+    return recipes.map(this.serializeRecipe)
+  },
+
+  serializeRecipe(recipe) {
     return {
-      id: rcpTree.id,
-      title: xss(rcpTree.title),
-      folder: rcpTree.folder_name,
-      author: rcpTree.author || {},
-      folder: rcpTree.folder || {}
+      id: recipe.id,
+      title: xss(recipe.title),
+      folder_id: recipe.folder_id
     }
   },
 
@@ -103,15 +120,9 @@ const RecipesService = {
   }
 }
 
-const userInfo = [
-  'usr.id AS author:id',
-  'usr.username AS author:username',
-  'usr.nickname AS author:nickname'
-]
-
-const folderInfo = [
-  'fld.id AS folder:id',
-  'fld.folder_name AS folder:name'
-]
+// const folderInfo = [
+//   'fld.id AS folder:id',
+//   'fld.folder_name AS folder:name'
+// ]
 
 module.exports = RecipesService

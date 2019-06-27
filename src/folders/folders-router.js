@@ -1,13 +1,11 @@
 const express = require('express')
 const path = require('path')
 const FoldersServices = require('./folders-service')
-// const { requireAuth } = require('../middleware/jwt-auth')
 
 const foldersRouter = express.Router()
 const jsonParser = express.json()
 
 foldersRouter.route('/')
-  // .all(requireAuth)
   .get((req, res, next) => {
     FoldersServices.getAllFolders(req.app.get('db'))
       .then(folders => {
@@ -16,8 +14,6 @@ foldersRouter.route('/')
       .catch(next)
   })
   .post(jsonParser, (req, res, next) => {
-    console.log('req.body', req.body)
-
     for (const [key, value] of Object.entries(req.body)) {
       if (value === null) {
         return res.status(400).json({
@@ -38,7 +34,6 @@ foldersRouter.route('/')
   })
 
 foldersRouter.route('/:folder_id')
-  // .all(requireAuth)
   .all(checkFolderExists)
   .get((req, res) => {
     return res.json(FoldersServices.serializeFolder(res.folder))
@@ -63,7 +58,7 @@ foldersRouter.route('/:folder_id')
       req.app.get('db'),
       req.params.folder_id
     )
-      .then(numRowsAffected => res.status(204).end)
+      .then(numRowsAffected => res.status(204).end())
       .catch(next)
   })
 

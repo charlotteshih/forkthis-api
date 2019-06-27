@@ -1,7 +1,6 @@
 BEGIN;
 
 TRUNCATE
-    users,
     folders,
     ingredients,
     instructions,
@@ -9,10 +8,6 @@ TRUNCATE
     recipe_items,
     recipe_steps
     RESTART IDENTITY CASCADE;
-
-INSERT INTO users (username, password, nickname)
-VALUES
-    ('cyshih', 'Password123!', 'Charlotte');
 
 INSERT INTO folders (folder_name)
 VALUES
