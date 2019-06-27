@@ -62,6 +62,14 @@ const RecipesService = {
       )
   },
 
+  insertRecipe(db, newRecipe) {
+    return db
+      .insert(newRecipe)
+      .into('recipes')
+      .returning('*')
+      .then(rows => rows[0])
+  },
+
   treeizeRecipes(recipes) {
     return recipes.map(this.treeizeRecipe)
   },

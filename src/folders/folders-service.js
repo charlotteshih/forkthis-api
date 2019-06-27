@@ -22,9 +22,7 @@ const FoldersServices = {
       .insert(newFolder)
       .into('folders')
       .returning('*')
-      .then(rows => {
-        return rows[0]
-      })
+      .then(rows => rows[0])
   },
 
   updateFolder(db, id, newFolderFields) {

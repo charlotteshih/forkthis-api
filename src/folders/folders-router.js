@@ -16,8 +16,6 @@ foldersRouter.route('/')
       .catch(next)
   })
   .post(jsonParser, (req, res, next) => {
-    console.log('req.body', req.body)
-
     for (const [key, value] of Object.entries(req.body)) {
       if (value === null) {
         return res.status(400).json({
@@ -28,7 +26,7 @@ foldersRouter.route('/')
     FoldersServices.insertFolder(
       req.app.get('db'),
       req.body
-      )
+    )
       .then(folder => {
         res.status(201)
           .location(path.posix.join(req.originalUrl, `/${folder.id}`))
@@ -63,7 +61,7 @@ foldersRouter.route('/:folder_id')
       req.app.get('db'),
       req.params.folder_id
     )
-      .then(numRowsAffected => res.status(204).end)
+      .then(numRowsAffected => res.status(204).end())
       .catch(next)
   })
 
