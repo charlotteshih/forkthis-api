@@ -1,55 +1,50 @@
 const xss = require('xss')
-const Treeize = require('treeize')
 
 const RecipesService = {
   getAllRecipes(db) {
     return db
-      .from('recipes AS rcp')
-      .select(
-        'rcp.id',
-        'rcp.title',
-        'rcp.folder_id'
-      )
-      .orderBy('rcp.id')
+    .select('*')
+      .from('recipes')
+      .orderBy('recipes.id')
   },
 
   getRecipeById(db, id) {
     return RecipesService.getAllRecipes(db)
-      .where('rcp.id', id)
+      .where('recipes.id', id)
       .first()
   },
 
   getRcpIngredients(db, rcp_id) {
     return db
-      .from('recipe_items as ri')
-      .where('ri.recipe_id', rcp_id)
+      .from('ingredients AS ing')
       .select(
-        'ri.quantity',
-        'ri.unit',
+        'ing.quantity',
+        'ing.unit',
         'ing.item'
       )
       .join(
-        'ingredients AS ing',
-        'ing.id',
-        'ri.item_id'
+        'recipes AS rcp',
+        'rcp.id',
+        'ing.recipe_id'
       )
-      .orderBy('ri.item_id')
+      .where('rcp.id', rcp_id)
+      .orderBy('ing.id')
   },
 
   getRcpSteps(db, rcp_id) {
     return db
-      .from('recipe_steps as rs')
-      .where('rs.recipe_id', rcp_id)
+      .from('steps')
       .select(
-        'rs.sort_order',
-        'ins.step'
+        'steps.sort_order',
+        'steps.step'
       )
       .join(
-        'instructions AS ins',
-        'ins.id',
-        'rs.step_id'
+        'recipes AS rcp',
+        'rcp.id',
+        'steps.recipe_id'
       )
-      .orderBy('rs.sort_order')
+      .where('rcp.id', rcp_id)
+      .orderBy('steps.sort_order')
   },
 
   insertRecipe(db, newRecipe) {
@@ -60,12 +55,20 @@ const RecipesService = {
       .then(rows => rows[0])
   },
 
-  insertIngredients(db, id, newIngredients) {
-    return db('recipe_items').where({ id }).update(newIngredients)
+  insertIngredients(db, newIngs) {
+    return db
+      .insert(newIngs)
+      .into('ingredients')
+      .returning('*')
+      .then(rows => rows[0])
   },
 
-  insertSteps(db, id, newSteps) {
-    return db('recipe_steps').where({ id }).update(newSteps)
+  insertSteps(db, newSteps) {
+    return db
+      .insert(newSteps)
+      .into('steps')
+      .returning('*')
+      .then(rows => rows[0])
   },
 
   updateRecipe(db, id, newRecipeFields) {

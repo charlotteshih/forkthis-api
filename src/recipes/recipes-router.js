@@ -14,9 +14,7 @@ recipesRouter.route('/')
       .catch(next)
   })
   .post(jsonParser, (req, res, next) => {
-    const { title, folder_id } = req.body
-    const newRecipe = { title, folder_id }
-
+    const newRecipe = req.body
     for (const [key, value] of Object.entries(newRecipe)) {
       if (value === null) {
         return res.status(400).json({
@@ -26,12 +24,12 @@ recipesRouter.route('/')
     }
     RecipesService.insertRecipe(
       req.app.get('db'),
-      newRecipe
+      req.body
     )
-      .then(recipe => {
+      .then(newRecipe => {
         res.status(201)
-          .location(path.posix.join(req.originalUrl), `/${recipe.id}`)
-          .json(RecipesService.serializeRecipe(recipe))
+          .location(path.posix.join(req.originalUrl), `/${newRecipe.id}`)
+          .json(RecipesService.serializeRecipe(newRecipe))
       })
       .catch(next)
   })
@@ -41,23 +39,6 @@ recipesRouter.route('/:rcp_id')
   .get((req, res) => {
     return res.json(RecipesService.serializeRecipe(res.recipe))
   })
-  .post(jsonParser, (req, res, next) => {
-    const { quantity, unit, item } = req.body
-    const newIngredients = { quantity, unit, item }
-
-    RecipesService.insertIngredients(
-      req.app.get('db'),
-      newIngredients
-    )
-      .then(ing => {
-        res.status(201)
-          .location(path.posix.join(req.originalUrl), `/ingredients`)
-          .json(RecipesService.serializeIngredients(ing))
-      })
-      .catch(next)
-  })
-  // POST request for new steps????
-  // .post()
   .patch(jsonParser, (req, res, next) => {
     const db = req.app.get('db')
     const recipe_id = req.params.rcp_id
@@ -94,6 +75,20 @@ recipesRouter.route('/:rcp_id/ingredients')
       })
       .catch(next)
   })
+  // NOTE: THIS IS ONLY ABLE TO POST ONE OBJECT AT A TIME.
+  //       HAVE TO FIGURE OUT HOW TO POST ARRAY OF OBJECTS.
+  .post(jsonParser, (req, res, next) => {
+    RecipesService.insertIngredients(
+      req.app.get('db'),
+      req.body
+    )
+      .then(ing => {
+        res.status(201)
+          .location(path.posix.join(req.originalUrl), `/${ing.id}`)
+          .json(RecipesService.serializeIngredient(ing))
+      })
+      .catch(next)
+  })
   // .patch()
 
 recipesRouter.route('/:rcp_id/steps')
@@ -108,7 +103,20 @@ recipesRouter.route('/:rcp_id/steps')
       })
       .catch(next)
   })
-  // .post()
+  // NOTE: THIS IS ONLY ABLE TO POST ONE OBJECT AT A TIME.
+  //       HAVE TO FIGURE OUT HOW TO POST ARRAY OF OBJECTS.
+  .post(jsonParser, (req, res, next) => {
+    RecipesService.insertSteps(
+      req.app.get('db'),
+      req.body
+    )
+      .then(step => {
+        res.status(201)
+          .location(path.posix.join(req.originalUrl), `/steps`)
+          .json(RecipesService.serializeStep(step))
+      })
+      .catch(next)
+  })
   // .patch()
 
 async function checkRcpExists(req, res, next) {
