@@ -1,4 +1,5 @@
 const xss = require('xss')
+// const Treeize = require('treeize')
 
 const RecipesService = {
   getAllRecipes(db) {
@@ -7,6 +8,26 @@ const RecipesService = {
       .from('recipes')
       .orderBy('recipes.id')
   },
+  // getAllRecipes(db) {
+  //   return db
+  //     .from('recipes AS rcp')
+  //     .join(
+  //       'ingredients AS ing',
+  //       'ing.recipe_id',
+  //       'rcp.id'
+  //     )
+  //     .join(
+  //       'steps',
+  //       'steps.recipe_id',
+  //       'rcp.id'
+  //     )
+  //     .select(
+  //       'rcp.title',
+  //       'rcp.folder_id',
+  //       ...rcpIngs,
+  //       ...rcpSteps
+  //     )
+  // },
 
   getRecipeById(db, id) {
     return RecipesService.getAllRecipes(db)
@@ -18,6 +39,7 @@ const RecipesService = {
     return db
       .from('ingredients AS ing')
       .select(
+        'ing.id',
         'ing.quantity',
         'ing.unit',
         'ing.item'
@@ -35,6 +57,7 @@ const RecipesService = {
     return db
       .from('steps')
       .select(
+        'steps.id',
         'steps.sort_order',
         'steps.step'
       )
@@ -75,17 +98,25 @@ const RecipesService = {
     return db('recipes').where({ id }).update(newRecipeFields)
   },
 
-  updateIngredients() {},
+  updateIngredients(db, id, ingToUpdate) {
+    return db('ingredients').where({ id }).update(ingToUpdate)
+  },
 
-  updateSteps() {},
+  updateSteps(db, id, stepToUpdate) {
+    return db('steps').where({ id }).update(stepToUpdate)
+  },
 
   deleteRecipe(db, id) {
     return db('recipes').where({ id }).delete()
   },
 
-  deleteIngredients() {},
+  deleteIngredient(db, id) {
+    return db('ingredients').where({ id }).delete()
+  },
 
-  deleteSteps() {},
+  deleteStep(db, id) {
+    return db('steps').where({ id }).delete()
+  },
 
   serializeRecipes(recipes) {
     return recipes.map(this.serializeRecipe)
@@ -97,6 +128,16 @@ const RecipesService = {
       title: xss(recipe.title),
       folder_id: recipe.folder_id
     }
+    // const tree = new Treeize()
+    // const rcpTree = tree.grow([ recipe ]).getData()[0]
+
+    // return {
+    //   id: rcpTree.id,
+    //   title: xss(rcpTree.title),
+    //   folder_id: rcpTree.folder_id,
+    //   ingredients: rcpTree.ingredients || [],
+    //   steps: rcpTree.steps || []
+    // }
   },
 
   serializeIngredients(ingredients) {
@@ -105,6 +146,7 @@ const RecipesService = {
 
   serializeIngredient(ingredient) {
     return {
+      id: ingredient.id,
       quantity: xss(ingredient.quantity),
       unit: xss(ingredient.unit),
       item: xss(ingredient.item)
@@ -117,15 +159,22 @@ const RecipesService = {
 
   serializeStep(step) {
     return {
+      id: step.id,
       order: step.sort_order,
       step: xss(step.step)
     }
   }
 }
 
-// const folderInfo = [
-//   'fld.id AS folder:id',
-//   'fld.folder_name AS folder:name'
+// const rcpIngs = [
+//   'ing.quantity AS ingredients:quantity',
+//   'ing.unit AS ingredients:unit',
+//   'ing.item AS ingredients:item'
+// ]
+
+// const rcpSteps = [
+//   'steps.sort_order AS steps:sort_order',
+//   'steps.step AS steps:step'
 // ]
 
 module.exports = RecipesService

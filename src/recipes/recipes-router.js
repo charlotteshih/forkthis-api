@@ -76,7 +76,8 @@ recipesRouter.route('/:rcp_id/ingredients')
       .catch(next)
   })
   // NOTE: THIS IS ONLY ABLE TO POST ONE OBJECT AT A TIME.
-  //       HAVE TO FIGURE OUT HOW TO POST ARRAY OF OBJECTS.
+  //       HAVE TO FIGURE OUT HOW TO POST ARRAY OF OBJECTS?
+  //       BUT I CAN KEEP POSTING MORE OBJECTS...
   .post(jsonParser, (req, res, next) => {
     RecipesService.insertIngredients(
       req.app.get('db'),
@@ -89,7 +90,35 @@ recipesRouter.route('/:rcp_id/ingredients')
       })
       .catch(next)
   })
-  // .patch()
+
+recipesRouter.route('/:rcp_id/ingredients/:ing_id')
+  .all(checkRcpExists)
+  .patch(jsonParser, (req, res, next) => {
+    const { recipe_id, quantity, unit, item } = req.body
+    const ingToUpdate = { recipe_id, quantity, unit, item }
+    const numberOfValues = Object.values(ingToUpdate).filter(Boolean).length
+
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: { message: `Request body must contain either 'recipe_id', 'quantity', 'unit', or 'item'.` }
+      })
+    }
+    RecipesService.updateIngredients(
+      req.app.get('db'),
+      req.params.ing_id,
+      ingToUpdate
+    )
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next)
+  })
+  .delete((req, res, next) => {
+    RecipesService.deleteIngredient(
+      req.app.get('db'),
+      req.params.ing_id
+    )
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next)
+  })
 
 recipesRouter.route('/:rcp_id/steps')
   .all(checkRcpExists)
@@ -117,7 +146,35 @@ recipesRouter.route('/:rcp_id/steps')
       })
       .catch(next)
   })
-  // .patch()
+
+recipesRouter.route('/:rcp_id/steps/:step_id')
+  .all(checkRcpExists)
+  .patch(jsonParser, (req, res, next) => {
+    const { recipe_id, sort_order, step } = req.body
+    const stepToUpdate = { recipe_id, sort_order, step }
+    const numberOfValues = Object.values(stepToUpdate).filter(Boolean).length
+    
+    if (numberOfValues === 0) {
+      return res.status(400).json({
+        error: { message: `Request body must contain either 'recipe_id', 'sort_order', or 'step'.` }
+      })
+    }
+    RecipesService.updateSteps(
+      req.app.get('db'),
+      req.params.step_id,
+      stepToUpdate
+    )
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next)
+  })
+  .delete((req, res, next) => {
+    RecipesService.deleteStep(
+      req.app.get('db'),
+      req.params.step_id
+    )
+      .then(numRowsAffected => res.status(204).end())
+      .catch(next)
+  })
 
 async function checkRcpExists(req, res, next) {
   try {
