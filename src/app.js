@@ -11,11 +11,14 @@ const stepsRouter = require('./steps/steps-router')
 
 const app = express()
 
-app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', {
-  skip: () => NODE_ENV === 'test',
-}))
+const morganOption = (NODE_ENV === 'production')
+	? tiny
+	: common
+
 app.use(cors())
+app.options('*', cors())
 app.use(helmet())
+app.use(morgan(morganOption))
 
 app.use('/api/recipes', recipesRouter)
 app.use('/api/folders', foldersRouter)
