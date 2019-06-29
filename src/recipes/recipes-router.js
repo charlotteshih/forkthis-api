@@ -34,7 +34,7 @@ recipesRouter.route('/')
       .catch(next)
   })
 
-recipesRouter.route('/:rcp_id')
+recipesRouter.route('/:rcp_id/')
   .all(checkRcpExists)
   .get((req, res) => {
     return res.json(RecipesService.serializeRecipe(res.recipe))

@@ -13,20 +13,22 @@ ingredientsRouter.route('/')
       })
       .catch(next)
   })
-  // NOTE: THIS IS ONLY ABLE TO POST ONE OBJECT AT A TIME.
-  //       HAVE TO FIGURE OUT HOW TO POST ARRAY OF OBJECTS?
-  //       BUT I CAN KEEP POSTING MORE OBJECTS...
   .post(jsonParser, (req, res, next) => {
+    const data = req.body.ing
+    const { recipe_id, quantity, unit, item } = data
+    const newIng = { recipe_id, quantity, unit, item }
+
     IngredientsService.insertIngredients(
       req.app.get('db'),
-      req.body
+      newIng
     )
       .then(ing => {
         res.status(201)
           .location(path.posix.join(req.originalUrl), `/item/${ing.id}`)
           .json(IngredientsService.serializeIngredient(ing))
       })
-  })
+      .catch(next)
+  });
 
 ingredientsRouter.route('/:rcp_id')
   .all(checkRcpExists)

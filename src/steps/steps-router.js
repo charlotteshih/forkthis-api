@@ -17,15 +17,20 @@ stepsRouter.route('/')
   //       HAVE TO FIGURE OUT HOW TO POST ARRAY OF OBJECTS?
   //       BUT I CAN KEEP POSTING MORE OBJECTS...
   .post(jsonParser, (req, res, next) => {
+    const data = req.body.step
+    const { recipe_id, sort_order, step } = data
+    const newStep = { recipe_id, sort_order, step }
+
     StepsService.insertSteps(
       req.app.get('db'),
-      req.body
+      newStep
     )
       .then(step => {
         res.status(201)
           .location(path.posix.join(req.originalUrl), `/step/${step.id}`)
           .json(StepsService.serializeStep(step))
       })
+      .catch(next)
   })
 
 stepsRouter.route('/:rcp_id')
