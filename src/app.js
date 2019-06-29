@@ -6,6 +6,8 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const recipesRouter = require('./recipes/recipes-router')
 const foldersRouter = require('./folders/folders-router')
+const ingredientsRouter = require('./ingredients/ingredients-router')
+const stepsRouter = require('./steps/steps-router')
 
 const app = express()
 
@@ -17,6 +19,8 @@ app.use(helmet())
 
 app.use('/api/recipes', recipesRouter)
 app.use('/api/folders', foldersRouter)
+app.use('/api/ingredients', ingredientsRouter)
+app.use('/api/steps', stepsRouter)
 
 app.use(errorHandler)
 
