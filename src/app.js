@@ -12,8 +12,8 @@ const stepsRouter = require('./steps/steps-router')
 const app = express()
 
 const morganOption = (NODE_ENV === 'production')
-	? tiny
-	: common
+	? 'tiny'
+	: 'common';
 
 app.use(cors())
 app.options('*', cors())
