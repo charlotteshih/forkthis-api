@@ -1,83 +1,175 @@
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-
-function makeUsersArray() {
+function makeFoldersArray() {
   return [
     {
       id: 1,
-      username: 'testuser1',
-      nickname: 'Test 1',
-      password: 'Password1!'
+      folder_name: 'Folder 1'
     },
     {
       id: 2,
-      username: 'testuser2',
-      nickname: 'Test 2',
-      password: 'Password2!'
+      folder_name: 'Folder 2'
     },
     {
       id: 3,
-      username: 'testuser3',
-      nickname: 'Test 3',
-      password: 'Password3!'
-    },
-    {
-      id: 4,
-      username: 'testuser4',
-      nickname: 'Test 4',
-      password: 'Password4!'
+      folder_name: 'Folder 3'
     }
   ]
 }
 
-// MAKE MORE FIXTURES AS I ADD MORE ENDPOINTS
+function makeRecipesArray() {
+  return [
+    {
+      id: 1,
+      title: 'Recipe 1',
+      folder_id: 3
+    },
+    {
+      id: 2,
+      title: 'Recipe 2',
+      folder_id: 1
+    },
+    {
+      id: 3,
+      title: 'Recipe 3',
+      folder_id: 2
+    }
+  ]
+}
+
+function makeIngredientsArray() {
+  return [
+    {
+      id: 1,
+      recipe_id: 1,
+      quantity: '1',
+      unit: 'Tbsp',
+      item: 'Sugar'
+    },
+    {
+      id: 2,
+      recipe_id: 2,
+      quantity: '9',
+      unit: '',
+      item: 'Eggs'
+    },
+    {
+      id: 3,
+      recipe_id: 3,
+      quantity: '4',
+      unit: 'Sticks',
+      item: 'Butter'
+    },
+  ]
+}
+
+function makeStepsArray() {
+  return [
+    {
+      id: 1,
+      recipe_id: 1,
+      sort_order: 1,
+      step: 'Cook'
+    },
+    {
+      id: 2,
+      recipe_id: 2,
+      sort_order: 1,
+      step: 'Eat'
+    },
+    {
+      id: 3,
+      recipe_id: 3,
+      sort_order: 1,
+      step: 'Yum'
+    },
+  ]
+}
+
 function makeFixtures() {
-  const testUsers = makeUsersArray()
-  return { testUsers }
+  const testFolders = makeFoldersArray()
+  const testRecipes = makeRecipesArray()
+  const testIngredients = makeIngredientsArray()
+  const testSteps = makeStepsArray()
+  return { testFolders, testRecipes, testIngredients, testSteps }
+}
+
+function seedFolders(db, folders) {
+  return db
+    .into("folders")
+    .insert(folders)
+    .then(() => {
+      db.raw(`SELECT setval('folders_id_seq', ?)`, [
+        folders[folders.length - 1].id
+      ]);
+    });
+}
+
+function seedRecipes(db, recipes) {
+  return db
+    .into("recipes")
+    .insert(recipes)
+    .then(() => {
+      db.raw(`SELECT setval('recipes_id_seq', ?)`, [
+        recipes[recipes.length - 1].id
+      ]);
+    });
+}
+
+function seedIngredients(db, ingredients) {
+  return db
+    .into('ingredients')
+    .insert(ingredients)
+    .then(() => {
+      db.raw(`SELECT setval('ingredients_id_seq', ?)`, [
+        ingredients[ingredients.length - 1].id
+      ])
+    })
+}
+
+function seedSteps(db, steps) {
+  return db
+    .into('steps')
+    .insert(steps)
+    .then(() => {
+      db.raw(`SELECT setval('steps_id_seq', ?)`, [
+        steps[steps.length - 1].id
+      ])
+    })
 }
 
 function cleanTables(db) {
-  return db.transaction(trx => {
-    trx.raw(
-      `TRUNCATE users`
+  return db.raw(
+      `BEGIN;
+      
+      TRUNCATE
+        steps,
+        ingredients,
+        recipes,
+        folders
+        RESTART IDENTITY CASCADE;
+      
+      ALTER SEQUENCE steps_id_seq MINVALUE 0 START WITH 1;
+      ALTER SEQUENCE ingredients_id_seq MINVALUE 0 START WITH 1;
+      ALTER SEQUENCE recipes_id_seq MINVALUE 0 START WITH 1;
+      ALTER SEQUENCE folders_id_seq MINVALUE 0 START WITH 1;
+
+      SELECT setval('steps_id_seq', 0);
+      SELECT setval('ingredients_id_seq', 0);
+      SELECT setval('recipes_id_seq', 0);
+      SELECT setval('folders_id_seq', 0);
+
+      COMMIT;`
     )
-    .then(() => {
-      Promise.all([
-        trx.raw(`ALTER SEQUENCE users minvalue 0 START WITH 1`),
-        trx.raw(`SELECT setval('users', 0)`)
-      ])
-    })
-  })
-}
-
-function seedUsers(db, users) {
-  const preppedUsers = users.map(user => ({
-    ...user,
-    password: bcrypt.hashSync(user.password, 1)
-  }))
-
-  return db
-    .insert(preppedUsers)
-    .into('users')
-    .then(() => {
-      db.raw(`SELECT setval('users', ?)`, [users[users.length - 1].id])
-    })
-}
-
-function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
-  const token = jwt.sign({ user_id: user.id }, secret, {
-    subject: user.username,
-    algorithm: 'HS256'
-  })
-  return `Bearer ${token}`
 }
 
 module.exports = {
-  makeUsersArray,
-
+  makeFoldersArray,
+  makeRecipesArray,
+  makeIngredientsArray,
+  makeStepsArray,
   makeFixtures,
+  seedFolders,
+  seedRecipes,
+  seedIngredients,
+  seedSteps,
   cleanTables,
-  seedUsers,
-
-  makeAuthHeader
 }

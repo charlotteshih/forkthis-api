@@ -25,6 +25,10 @@ app.use('/api/folders', foldersRouter)
 app.use('/api/ingredients', ingredientsRouter)
 app.use('/api/steps', stepsRouter)
 
+app.get("/", (req, res) => {
+  res.send("Hello, world!");
+})
+
 app.use(errorHandler)
 
 function errorHandler(error, req, res, next) {
